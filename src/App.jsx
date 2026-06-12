@@ -119,10 +119,20 @@ export default function AngyAssistant() {
           messages: newMessages.map(m => ({role: m.role, content: m.content}))
         })
       });
+
+      if(!response.ok) {
+        const err = await response.json();
+        console.error("API error:", err);
+        setMessages(prev => [...prev, {role:"assistant", content:"❌ Erreur API. Contactez-nous sur WhatsApp : +221 78 116 32 86 😊"}]);
+        setLoading(false);
+        return;
+      }
+
       const data = await response.json();
       const reply = data.content?.[0]?.text || "Désolé, je n'ai pas pu répondre. Contactez-nous sur WhatsApp : +221 78 116 32 86";
       setMessages(prev => [...prev, {role:"assistant", content:reply}]);
-    } catch {
+    } catch(e) {
+      console.error("Fetch error:", e);
       setMessages(prev => [...prev, {role:"assistant", content:"❌ Erreur de connexion. Contactez-nous directement sur WhatsApp : +221 78 116 32 86 😊"}]);
     }
     setLoading(false);
